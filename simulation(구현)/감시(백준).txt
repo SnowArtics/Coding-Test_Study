@@ -1,0 +1,202 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+short n, m;
+short arr[9][9];								//원본
+short copyArr[9][9];							//원본의 카피
+vector<pair<short, short>> CCTVPos;				//CCTV들의 위치
+short CCTVDir[4][5] = { {0x1, 0x5, 0x9, 0xD, 0xF}
+						, {0x2, 0xA, 0x3, 0xB, 0xF}
+						, {0x4, 0xA, 0x6, 0x7, 0xF}
+						, {0x8, 0xA, 0xC, 0xE, 0xF} };		//CCTV가 바라보는 방향. 0x1 = 오른쪽, 0x2 = 아래, 0x4 = 왼쪽, 0x8 = 위
+short canCCTVRot[5] = { 3,1,3,3,0 };			//CCTV가 회전할 수 있는 정도
+int result = 100;								//결과값	
+
+void CopyArr() {
+	for (int i = 0; i < 9; ++i) {
+		for (int j = 0; j < 9; ++j) {
+			copyArr[i][j] = arr[i][j];
+		}
+	}
+}
+
+void paintPath(int a, int b, pair<short,short> c) { //CCTV 번호, 회전 값, CCTV 위치
+	short lCCTVDir = CCTVDir[b][a-1];
+
+	auto copyC = c;
+
+	if (a == 3 && lCCTVDir == 0x6)
+		int asdf = 0;
+
+	short num = 0x8;
+	for (int i = 0; i < 4; ++i) {
+		if (lCCTVDir - num > -1) {
+			switch (num)
+			{
+			case 0x8:
+				while (copyC.first > 0) {
+					--copyC.first;
+					if(copyArr[copyC.first][copyC.second] == 0)
+						copyArr[copyC.first][copyC.second] = '#';
+					else if (copyArr[copyC.first][copyC.second] >= '#')
+						++copyArr[copyC.first][copyC.second];
+					else if (copyArr[copyC.first][copyC.second] == 6)
+						break;
+				}
+				break;
+			case 0x4:
+				while (copyC.second > 0) {
+					--copyC.second;
+					if (copyArr[copyC.first][copyC.second] == 0)
+						copyArr[copyC.first][copyC.second] = '#';
+					else if (copyArr[copyC.first][copyC.second] >= '#')
+						++copyArr[copyC.first][copyC.second];
+					else if (copyArr[copyC.first][copyC.second] == 6)
+						break;
+				}
+				break;
+			case 0x2:
+				while (copyC.first < n -1) {
+					++copyC.first;
+					if (copyArr[copyC.first][copyC.second] == 0)
+						copyArr[copyC.first][copyC.second] = '#';
+					else if (copyArr[copyC.first][copyC.second] >= '#')
+						++copyArr[copyC.first][copyC.second];
+					else if (copyArr[copyC.first][copyC.second] == 6)
+						break;
+				}
+				break;
+			case 0x1:
+				while (copyC.second < m -1) {
+					++copyC.second;
+					if (copyArr[copyC.first][copyC.second] == 0)
+						copyArr[copyC.first][copyC.second] = '#';
+					else if (copyArr[copyC.first][copyC.second] >= '#')
+						++copyArr[copyC.first][copyC.second];
+					else if (copyArr[copyC.first][copyC.second] == 6)
+						break;
+				}
+				break;
+			}
+
+			lCCTVDir -= num;
+		}
+		num /= 2;
+		copyC = c;
+	}	
+}
+
+void ErasePath(int a, int b, pair<short, short> c) { //CCTV 번호, 회전 값, CCTV 위치
+	short lCCTVDir = CCTVDir[b][a - 1];
+
+	auto copyC = c;
+
+	short num = 0x8;
+	for (int i = 0; i < 4; ++i) {
+		if (lCCTVDir - num > -1) {
+			switch (num)
+			{
+			case 0x8:
+				while (copyC.first > 0) {
+					--copyC.first;
+					if (copyArr[copyC.first][copyC.second] == '#')
+						copyArr[copyC.first][copyC.second] = 0;
+					else if (copyArr[copyC.first][copyC.second] > '#')
+						--copyArr[copyC.first][copyC.second];
+					else if (copyArr[copyC.first][copyC.second] == 6)
+						break;
+				}
+				break;
+			case 0x4:
+				while (copyC.second > 0) {
+					--copyC.second;
+					if (copyArr[copyC.first][copyC.second] == '#')
+						copyArr[copyC.first][copyC.second] = 0;
+					else if (copyArr[copyC.first][copyC.second] > '#')
+						--copyArr[copyC.first][copyC.second];
+					else if (copyArr[copyC.first][copyC.second] == 6)
+						break;
+				}
+				break;
+			case 0x2:
+				while (copyC.first < n -1 ) {
+					++copyC.first;
+					if (copyArr[copyC.first][copyC.second] == '#')
+						copyArr[copyC.first][copyC.second] = 0;
+					else if (copyArr[copyC.first][copyC.second] > '#')
+						--copyArr[copyC.first][copyC.second];
+					else if (copyArr[copyC.first][copyC.second] == 6)
+						break;
+				}
+				break;
+			case 0x1:
+				while (copyC.second < m- 1) {
+					++copyC.second;
+					if (copyArr[copyC.first][copyC.second] == '#')
+						copyArr[copyC.first][copyC.second] = 0;
+					else if (copyArr[copyC.first][copyC.second] > '#')
+						--copyArr[copyC.first][copyC.second];
+					else if (copyArr[copyC.first][copyC.second] == 6)
+						break;
+				}
+				break;
+			}
+
+			lCCTVDir -= num;
+		}
+		num /= 2;
+		copyC = c;
+	}
+}
+
+void func(int _k) {
+	if (_k == CCTVPos.size()) {
+		int lResult = 0;
+		for (int i = 0; i < n; ++i) {
+			for (int j = 0; j < m; ++j) {
+				if (copyArr[i][j] == 0)
+					++lResult;
+			}
+		}
+		if (lResult < result)
+			result = lResult;
+
+		return;
+	}
+
+	//카메라 번호를 들고옴.
+	int cameraType = copyArr[CCTVPos[_k].first][CCTVPos[_k].second];
+
+	//카메라가 회전 가능한 횟수만큼 반복
+	for (int j = 0; j <= canCCTVRot[cameraType-1]; ++j) {
+		paintPath(cameraType, j, CCTVPos[_k]);
+		func(_k+1);
+		ErasePath(cameraType, j, CCTVPos[_k]);
+	}
+
+	return;
+}
+
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+
+	cin >> n >> m;
+
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < m; ++j) {
+			cin >> arr[i][j];
+			if (arr[i][j] > 0 && arr[i][j] < 6) {
+				CCTVPos.push_back(make_pair(i, j));
+			}
+		}
+	}
+
+	CopyArr();
+
+	func(0);
+
+	cout << result;
+	return 0;
+}
