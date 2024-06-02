@@ -2,9 +2,10 @@
 
 using namespace std;
 
-vector<bool> isPrime(1000001, true);
+
 vector<int> IsPrime(int m, int n) {
 	vector<int> primes;
+	vector<bool> isPrime(n+1, true);
 
 	isPrime[1] = false;
 	for (int i = 2; i * i < n+1; ++i) {
