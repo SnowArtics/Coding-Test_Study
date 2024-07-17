@@ -15,7 +15,7 @@ int main() {
 		int num; cin >> num;
 		if (maxPQ.size() > minPQ.size()) minPQ.push(num);
 		else maxPQ.push(num);
-		while (maxPQ.top() > minPQ.top()) {
+		if(maxPQ.top() > minPQ.top()) {
 			int maxNum, minNum;
 			maxNum = maxPQ.top(); maxPQ.pop();
 			minNum = minPQ.top(); minPQ.pop();
